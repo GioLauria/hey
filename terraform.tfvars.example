@@ -3,6 +3,7 @@
 # DO NOT commit terraform.tfvars to version control
 
 # Database Configuration
+db_username = "postgres"
 db_password = "your-secure-password-here"
 
 # AWS Region
