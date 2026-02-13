@@ -1,5 +1,11 @@
 # Terraform Variables Definition
 
+variable "db_username" {
+  description = "Username for the PostgreSQL database"
+  type        = string
+  default     = "postgres"
+}
+
 variable "db_password" {
   description = "Password for the PostgreSQL database"
   type        = string

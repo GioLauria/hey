@@ -1498,7 +1498,7 @@ resource "aws_db_instance" "hey_postgres" {
   instance_class         = "db.t3.micro"
   allocated_storage      = 20
   storage_type           = "gp2"
-  username               = "postgres"
+  username               = var.db_username
   password               = var.db_password
   db_name                = "hey"
   publicly_accessible    = true  # For demo; set to false in production

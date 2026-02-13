@@ -1,3 +1,38 @@
+# HeyAWS - OCR Web Application
+
+This repository contains an OCR (Optical Character Recognition) web application built with AWS services using Terraform for infrastructure as code.
+
+## Features
+
+- Upload images and PDFs to extract text using AWS Textract
+- Store OCR results in DynamoDB
+- PostgreSQL database for restaurant management
+- Serverless backend with AWS Lambda
+- Static website hosted on S3 with CloudFront CDN
+- Real-time visitor analytics
+- Cost monitoring dashboard
+
+## Quick Start
+
+1. Clone the repository
+2. Copy `terraform.tfvars.example` to `terraform.tfvars` and configure your database credentials
+3. Run `terraform init`, `terraform plan`, `terraform apply`
+4. Access the website via the CloudFront URL output
+
+## Architecture
+
+The application uses a serverless architecture with the following AWS services:
+- S3 for static website hosting and file storage
+- CloudFront for CDN and security (WAF)
+- API Gateway for REST API
+- Lambda functions for backend logic
+- DynamoDB for OCR data storage
+- RDS PostgreSQL for relational data
+- Textract for OCR processing
+- Comprehend for text analysis
+
+---
+
 # OCR Web Application — Master Prompt
 
 Use this prompt to recreate the entire project from scratch. Everything is managed via Terraform and deployed to AWS.
@@ -60,7 +95,7 @@ Use Terraform with AWS provider >= 5.0. All resources go in a single `main.tf` f
 
 - Instance named `hey` with PostgreSQL engine version 15.
 - Instance class `db.t3.micro`, allocated storage 20 GB (gp2), publicly accessible for demo.
-- Username `postgres`, password `password123` (change in production).
+- Username and password configured via Terraform variables (`var.db_username`, `var.db_password`).
 - Database name `hey`.
 - Custom VPC with two subnets in eu-west-2a and eu-west-2b, internet gateway, and route table.
 - Security group allowing inbound on port 5432 from all IPs (restrict in production).
