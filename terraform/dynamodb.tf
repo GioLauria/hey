@@ -2,7 +2,7 @@
 
 resource "aws_dynamodb_table" "extractions" {
   name         = "ocr-extractions"
-  billing_mode = "PAY_PER_REQUEST"
+  billing_mode = var.dynamodb_billing_mode
   hash_key     = "id"
 
   attribute {
@@ -17,7 +17,7 @@ resource "aws_dynamodb_table" "extractions" {
 
 resource "aws_dynamodb_table" "visitors" {
   name         = "ocr-visitors"
-  billing_mode = "PAY_PER_REQUEST"
+  billing_mode = var.dynamodb_billing_mode
   hash_key     = "ip"
 
   attribute {
@@ -41,7 +41,7 @@ resource "aws_dynamodb_table" "visitors" {
 
 resource "aws_dynamodb_table" "menu_items" {
   name         = "menu-items"
-  billing_mode = "PAY_PER_REQUEST"
+  billing_mode = var.dynamodb_billing_mode
   hash_key     = "id"
 
   attribute {
@@ -52,7 +52,7 @@ resource "aws_dynamodb_table" "menu_items" {
 
 resource "aws_dynamodb_table" "todos" {
   name         = "ocr-todos"
-  billing_mode = "PAY_PER_REQUEST"
+  billing_mode = var.dynamodb_billing_mode
   hash_key     = "id"
 
   attribute {

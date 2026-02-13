@@ -24,3 +24,9 @@ variable "project_name" {
   type        = string
   default     = "HeyAWS"
 }
+
+variable "dynamodb_billing_mode" {
+  description = "Billing mode for DynamoDB tables"
+  type        = string
+  default     = "PAY_PER_REQUEST"
+}
