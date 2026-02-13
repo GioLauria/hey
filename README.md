@@ -1,4 +1,4 @@
-# HeyAWS - OCR Restaurant Management System
+# Hey - OCR Restaurant Management System
 
 Un sistema completo per la gestione di ristoranti con funzionalità OCR per l'estrazione di testo da documenti e immagini.
 
@@ -25,7 +25,7 @@ Un sistema completo per la gestione di ristoranti con funzionalità OCR per l'es
 ### 1. Clona il repository
 ```bash
 git clone <repository-url>
-cd HeyAWS
+cd Hey
 ```
 
 ### 2. Installa dipendenze Python
@@ -72,7 +72,7 @@ db_password = "your-secure-password-here"
 region = "eu-west-2"
 
 # Project name
-project_name = "HeyAWS"
+project_name = "Hey"
 ```
 
 ### 5. Deploy dell'infrastruttura
@@ -163,7 +163,7 @@ Apri `site/index.html` nel browser per accedere all'interfaccia web.
 ## 📁 Struttura del Progetto
 
 ```
-HeyAWS/
+Hey/
 ├── DB Management/          # Script gestione database
 ├── lambda/                 # Funzioni AWS Lambda
 ├── site/                   # Frontend web

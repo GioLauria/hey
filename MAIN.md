@@ -1,4 +1,4 @@
-# HeyAWS - OCR Web Application
+# Hey - OCR Web Application
 
 This repository contains an OCR (Optical Character Recognition) web application built with AWS services using Terraform for infrastructure as code.
 
@@ -327,9 +327,9 @@ Use Terraform with AWS provider >= 5.0. Infrastructure is organized into modular
 
 - Python 3.11, timeout 10s, memory 128MB, handler `lambda_costs.lambda_handler`.
 - IAM role with `ce:GetCostAndUsage` and `tag:GetResources` on `*`, plus CloudWatch Logs.
-- Environment variables: `PROJECT_REGION` = `eu-west-2`, `PROJECT_TAG_KEY` = `Project`, `PROJECT_TAG_VALUE` = `HeyAWS`.
+- Environment variables: `PROJECT_REGION` = `eu-west-2`, `PROJECT_TAG_KEY` = `Project`, `PROJECT_TAG_VALUE` = `Hey`.
 - Uses the Cost Explorer client in **us-east-1** (Cost Explorer API is only available in us-east-1 regardless of the region your resources are in).
-- **Dynamic service discovery**: Uses the Resource Groups Tagging API (`resourcegroupstaggingapi`) to find all resources tagged with `Project = HeyAWS`. Extracts the AWS service type from each resource ARN and maps it to the Cost Explorer display name using a comprehensive `ARN_TO_CE` dictionary (covering 100+ AWS services across Compute, Storage, Database, Networking, AI/ML, Monitoring, Security, Messaging, Developer Tools, Analytics, IoT, Containers, and Migration categories).
+- **Dynamic service discovery**: Uses the Resource Groups Tagging API (`resourcegroupstaggingapi`) to find all resources tagged with `Project = Hey`. Extracts the AWS service type from each resource ARN and maps it to the Cost Explorer display name using a comprehensive `ARN_TO_CE` dictionary (covering 100+ AWS services across Compute, Storage, Database, Networking, AI/ML, Monitoring, Security, Messaging, Developer Tools, Analytics, IoT, Containers, and Migration categories).
 - **Cost query**: Calls `ce.get_cost_and_usage()` with `Granularity`: DAILY (for accurate partial month sums). `Metrics`: UnblendedCost. `GroupBy`: DIMENSION by SERVICE. `Filter`: RECORD_TYPE = Usage. No region filter applied.
 - `TimePeriod`: Start = first day of current month, End = tomorrow (to include today).
 - Service filtering is currently commented out to show all costs.

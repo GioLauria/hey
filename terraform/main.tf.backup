@@ -670,7 +670,7 @@ resource "aws_lambda_function" "costs" {
   environment {
     variables = {
       PROJECT_TAG_KEY   = "Project"
-      PROJECT_TAG_VALUE = "HeyAWS"
+      PROJECT_TAG_VALUE = "Hey"
     }
   }
   timeout          = 10
@@ -1159,7 +1159,7 @@ provider "aws" {
   region = "eu-west-2"
   default_tags {
     tags = {
-      Project = "HeyAWS"
+      Project = "Hey"
     }
   }
 }
@@ -1170,7 +1170,7 @@ provider "aws" {
   region = "us-east-1"
   default_tags {
     tags = {
-      Project = "HeyAWS"
+      Project = "Hey"
     }
   }
 }

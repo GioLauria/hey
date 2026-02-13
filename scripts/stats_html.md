@@ -55,5 +55,4 @@ Dedicated **visitor statistics and analytics page** accessible by clicking the v
 ## Mobile Responsiveness
 - Responsive grid layout that stacks on smaller screens
 - Charts adapt to container width
-- Touch-friendly navigation buttons</content>
-<parameter name="filePath">c:\Users\giova\OneDrive\Development\HeyAWS\scripts\stats_html.md
+- Touch-friendly navigation buttons

@@ -10,4 +10,4 @@ db_password = "your-secure-password-here"
 region = "eu-west-2"
 
 # Project tags
-project_name = "HeyAWS"
+project_name = "Hey"

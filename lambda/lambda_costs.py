@@ -7,7 +7,7 @@ ce = boto3.client('ce', region_name='us-east-1')  # Cost Explorer API only avail
 tagging = boto3.client('resourcegroupstaggingapi')
 
 TAG_KEY = os.environ.get('PROJECT_TAG_KEY', 'Project')
-TAG_VALUE = os.environ.get('PROJECT_TAG_VALUE', 'HeyAWS')
+TAG_VALUE = os.environ.get('PROJECT_TAG_VALUE', 'Hey')
 
 # Implicit services: when a tagged service is found, also include these
 # related CE services that don't have their own tagged resources
