@@ -31,6 +31,72 @@ The application uses a serverless architecture with the following AWS services:
 - Textract for OCR processing
 - Comprehend for text analysis
 
+## Development
+
+### Prerequisites
+- Git
+- Terraform >= 1.0
+- AWS CLI configured with appropriate permissions
+- Python 3.11 (for local development/testing)
+
+### Git Setup and Workflow
+
+#### Cloning the Repository
+```bash
+git clone https://github.com/GioLauria/hey.git
+cd hey
+```
+
+#### Branching Strategy
+- `main`: Production-ready code
+- Feature branches: `feature/feature-name` for new features
+- Bug fixes: `fix/bug-description`
+
+#### Commit Guidelines
+- Use clear, descriptive commit messages
+- All commits must be signed with GPG for verification
+- Follow conventional commit format when possible
+
+#### Setting up GPG Signing
+1. Generate a GPG key using Kleopatra (Windows) or `gpg --gen-key`
+2. Add your public key to GitHub: Settings → SSH and GPG keys → New GPG key
+3. Configure Git to use your key:
+   ```bash
+   git config --global user.signingkey YOUR_KEY_ID
+   git config --global commit.gpgsign true
+   ```
+4. Export public key and add to GitHub
+
+#### Development Workflow
+1. Create a feature branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. Make changes following the maintenance rules:
+   - Update `MAIN.md` for infrastructure changes
+   - Update `scripts/<name>.md` for Lambda/frontend changes
+   - Test changes locally
+   - Run `terraform plan` and `terraform apply` if infrastructure changes
+
+3. Commit changes:
+   ```bash
+   git add .
+   git commit -S -m "feat: add your feature description"
+   ```
+
+4. Push and create pull request:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+#### Maintenance Rules
+- **ALWAYS update MAIN.md** after any infrastructure changes
+- **ALWAYS update the corresponding `scripts/<name>.md`** file when modifying Lambda or frontend code
+- Run `terraform apply` after infrastructure changes
+- Ensure all commits are GPG signed
+- Keep the repository synchronized with AWS infrastructure
+
 ---
 
 # OCR Web Application — Master Prompt
