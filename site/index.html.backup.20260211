@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCR Image Upload</title>
+  <link rel="icon" href="hey.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="container">
+    <img src="hey.png" alt="Hey Logo" class="logo">
+    <h1>Upload an Image for OCR</h1>
+    <form id="uploadForm">
+      <input type="file" id="imageInput" accept="image/*" required />
+      <select id="restaurantSelect" required>
+        <option value="">Select Restaurant</option>
+        <option value="turin_delcambio_1234">Del Cambio</option>
+        <option value="turin_lapiola_5678">La Piola</option>
+        <option value="turin_piazzaduomo_9012">Piazza Duomo</option>
+        <option value="turin_carloalberto_3456">Carlo Alberto</option>
+        <option value="turin_solferino_7890">Solferino</option>
+        <option value="turin_torino_1122">Torino</option>
+        <option value="turin_bicerin_3344">Bicerin</option>
+        <option value="turin_giolitti_5566">Giolitti</option>
+        <option value="turin_platti_7788">Platti</option>
+        <option value="turin_caffeparisi_9900">Caffè Parisi</option>
+      </select>
+      <button type="submit" id="submitBtn">Extract Text</button>
+    </form>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <!-- History section -->
+  <div class="history" id="historySection">
+    <h2>Extraction History <button id="refreshBtn" onclick="loadHistory()">Refresh</button></h2>
+    <ul class="history-list" id="historyList">
+      <li class="history-loading">Loading...</li>
+    </ul>
+  </div>
+
+  <!-- Visitor counter -->
+  <div class="visitor-counter" id="visitorCounter"></div>
+
+  <!-- Result overlay -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-content">
+      <div class="overlay-header">
+        <h2 id="overlayTitle">Extracted Text</h2>
+        <button class="overlay-close" id="overlayClose">&times;</button>
+      </div>
+      <div class="overlay-body">
+        <img id="overlayImage" class="overlay-image" alt="Uploaded image" />
+        <div class="confidence-bar" id="confidenceBar" style="display:none">
+          <span>Confidence:</span>
+          <div class="confidence-meter"><div class="confidence-fill" id="confidenceFill"></div></div>
+          <span id="confidenceLabel"></span>
+        </div>
+        <div class="overlay-tabs" id="overlayTabs">
+          <button class="overlay-tab active" data-tab="confidence" onclick="switchTab('confidence')">Confidence View</button>
+          <button class="overlay-tab" data-tab="edit" onclick="switchTab('edit')">Edit Text</button>
+          <button class="overlay-tab" data-tab="validate" onclick="switchTab('validate')">NLP Validation</button>
+          <button class="overlay-tab" data-tab="menu" onclick="switchTab('menu')">Menu</button>
+        </div>
+        <div class="tab-panel active" id="tab-confidence">
+          <div class="conf-text" id="confText"></div>
+        </div>
+        <div class="tab-panel" id="tab-edit">
+          <textarea class="edit-area" id="editArea"></textarea>
+        </div>
+        <div class="tab-panel" id="tab-validate">
+          <div id="validateResults"><p style="color:#888">Click "Run NLP Validation" to analyze the text with Amazon Comprehend.</p></div>
+        </div>
+        <div class="tab-panel" id="tab-menu">
+          <div class="menu-list" id="menuList"></div>
+          <button class="btn-primary" onclick="showMenuForm()">Add Menu Item</button>
+          <div class="menu-form" id="menuForm" style="display:none">
+            <h3 id="menuFormTitle">Add New Menu Item</h3>
+            <input type="text" id="menuDishName" placeholder="Dish Name" required>
+            <textarea id="menuDescription" placeholder="Description"></textarea>
+            <div class="ingredients-list" id="ingredientsList">
+              <div class="ingredient-row">
+                <input type="text" placeholder="Ingredient" class="ing-name">
+                <input type="text" placeholder="Quantity" class="ing-qty">
+                <button onclick="removeIngredient(this)">Remove</button>
+              </div>
+            </div>
+            <button onclick="addIngredient()">Add Ingredient</button>
+            <input type="text" id="menuTTS" placeholder="Time to Serve (e.g., 15 mins)">
+            <input type="number" step="0.01" id="menuPTB" placeholder="Price to Public">
+            <button onclick="generateImage()">Generate AI Image</button>
+            <img id="menuImagePreview" style="max-width:200px; display:none" alt="Generated image">
+            <button class="btn-success" onclick="saveMenuItem()">Save</button>
+            <button onclick="hideMenuForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="overlay-footer">
+        <div class="footer-left">
+          <button id="copyBtn">Copy Text</button>
+          <button id="validateBtn" class="btn-warn" onclick="runValidation()">Run NLP Validation</button>
+        </div>
+        <div class="footer-right">
+          <button id="saveBtn" class="btn-success" onclick="saveCorrection()" style="display:none">Save Corrections</button>
+          <button id="closeBtn" class="btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cost panel (controlled by config.js) -->
+  <div class="cost-panel" id="costPanel" style="display:none">
+    <div class="cost-panel-header">
+      <div>AWS Costs<br><small id="costMonth"></small></div>
+      <button class="cost-panel-toggle" onclick="toggleCostPanel()" title="Collapse/Expand">&#x25B2;</button>
+    </div>
+    <div class="cost-panel-body">
+      <div class="cost-period-toggle">
+        <button class="cost-period-btn active" id="periodMonth" onclick="switchCostPeriod('month')">This Month</button>
+        <button class="cost-period-btn" id="periodYear" onclick="switchCostPeriod('year')">This Year</button>
+      </div>
+      <div class="cost-total">
+        <div class="label" id="costLabel">Total This Month</div>
+        <div class="amount" id="costTotal"><span class="currency">Loading...</span></div>
+      </div>
+      <ul class="cost-services" id="costServices">
+        <li class="cost-loading">Fetching cost data...</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- To-Do Lists Panel -->
+  <div class="todo-panel" id="todoPanel">
+    <div class="todo-panel-header">
+      <div>To-Do Lists</div>
+      <button class="todo-panel-toggle" onclick="toggleTodoPanel()" title="Collapse/Expand">&#x25BC;</button>
+    </div>
+    <div class="todo-panel-body">
+      <input type="text" id="newTodoInput" placeholder="Add new task..." onkeypress="handleTodoKeyPress(event)">
+      <button onclick="addTodo()">Add</button>
+      <ul class="todo-list" id="todoList">
+        <!-- Tasks will be loaded here -->
+      </ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

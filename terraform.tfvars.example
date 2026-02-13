@@ -1,0 +1,12 @@
+# Terraform Variables
+# Copy this file to terraform.tfvars and fill in your actual values
+# DO NOT commit terraform.tfvars to version control
+
+# Database Configuration
+db_password = "your-secure-password-here"
+
+# AWS Region
+region = "eu-west-2"
+
+# Project tags
+project_name = "HeyAWS"

@@ -1,0 +1,20 @@
+# Terraform Variables Definition
+
+variable "db_password" {
+  description = "Password for the PostgreSQL database"
+  type        = string
+  sensitive   = true
+  default     = "password123"  # Fallback for development - override in terraform.tfvars
+}
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "eu-west-2"
+}
+
+variable "project_name" {
+  description = "Name of the project"
+  type        = string
+  default     = "HeyAWS"
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visitor Statistics - OCR App</title>
+  <link rel="icon" href="hey.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="container stats-container">
+    <img src="hey.png" alt="Hey Logo" class="logo">
+    <h1>Visitor Statistics</h1>
+
+    <div style="background: yellow; padding: 20px; margin: 20px 0; display: none;" id="debugDiv">
+      DEBUG: Page loaded successfully
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Visitors</h3>
+        <div class="stat-value" id="totalVisitors">-</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Today's Visitors</h3>
+        <div class="stat-value" id="todayVisitors">-</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>This Week</h3>
+        <div class="stat-value" id="weekVisitors">-</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>This Month</h3>
+        <div class="stat-value" id="monthVisitors">-</div>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <h2>Top Browsers</h2>
+      <div class="chart-container" id="browserChart"></div>
+    </div>
+
+    <div class="stats-section">
+      <h2>Top Operating Systems</h2>
+      <div class="chart-container" id="osChart"></div>
+    </div>
+
+    <div class="stats-section">
+      <h2>Top Countries</h2>
+      <div class="chart-container" id="countryChart"></div>
+    </div>
+
+    <div class="stats-section">
+      <h2>Device Types</h2>
+      <div class="chart-container" id="deviceChart"></div>
+    </div>
+
+    <div class="stats-section">
+      <h2>Recent Visitors</h2>
+      <div class="recent-visitors" id="recentVisitors">
+        <div class="loading">Loading visitor data...</div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button onclick="goBack()" class="back-btn">← Back to Main Page</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load statistics when page loads
+      if (typeof loadStatistics === 'function') {
+        loadStatistics();
+      } else {
+        console.error('loadStatistics function not found');
+      }
+    });
+  </script>
+</body>
+</html>
