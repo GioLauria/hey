@@ -68,13 +68,13 @@ function showOverlay(text, title, imageKey, ocrData) {
   currentExtractionId = ocrData ? ocrData.id : null;
 
   // Confidence bar
-  if (ocrData && ocrData.avg_confidence !== undefined) {
+  if (ocrData && ocrData.avg_confidence !== undefined && confidenceBar && confidenceFill && confidenceLabel) {
     const avg = ocrData.avg_confidence;
     confidenceBar.style.display = 'flex';
     confidenceFill.style.width = avg + '%';
     confidenceFill.style.background = avg >= 95 ? '#22c55e' : avg >= 80 ? '#eab308' : '#ef4444';
     confidenceLabel.innerText = avg + '%';
-  } else {
+  } else if (confidenceBar) {
     confidenceBar.style.display = 'none';
   }
 
