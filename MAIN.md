@@ -350,7 +350,8 @@ Single-page HTML application with embedded CSS and JavaScript. Clean, modern UI 
 - Centered white modal (max 780px wide, max 90vh tall) with rounded corners.
 - Header with title (filename + date) and ✕ close button.
 - Scrollable body with:
-  - **Confidence meter bar** below the image — horizontal bar showing average confidence as a percentage. Color-coded: green (≥95%), yellow (≥80%), red (<80%). Only shown when `avg_confidence` is available.
+  - **Download link** for the original file (📥 Download Original File), shown when `imageKey` is available.
+  - **Confidence meter bar** — horizontal bar showing average confidence as a percentage. Color-coded: green (≥95%), yellow (≥80%), red (<80%). Only shown when `avg_confidence` is available.
   - **Three-tab interface** below the confidence bar:
     1. **Confidence View tab** (default): Renders extracted text with per-word color-coded highlighting. Each word is a `<span>` with a tooltip showing its confidence %. Colors: green background (`conf-high`, ≥95%), yellow (`conf-med`, ≥80%), red (`conf-low`, <80%). Lines are separated by `<br>`, indentation uses `&nbsp;`. Falls back to plain text when per-word data isn't available (history views).
     2. **Edit Text tab**: A `<textarea>` with the full extracted text, editable by the user. "Save Corrections" button appears in the footer when this tab is active. Saving calls `PUT /extractions` with `{id, text}` and marks the extraction as corrected in DynamoDB. Shows "Saving..."/"Saved!" feedback.
@@ -374,7 +375,7 @@ Single-page HTML application with embedded CSS and JavaScript. Clean, modern UI 
 3. Fetch presigned URL from `GET /presign?key=<filename>&hash=<sha256hash>` — this checks for duplicates before allowing upload.
 4. PUT the file to the presigned S3 URL with `Content-Type: application/octet-stream`.
 5. Call `GET /ocr?key=<filename>` — this triggers Textract AND saves to DynamoDB.
-6. Display the extracted text in the overlay with confidence-colored words (from `ocrData.lines[].words`) and the confidence meter.
+6. Display the extracted text in the overlay with the download link, confidence-colored words (from `ocrData.lines[].words`), and the confidence meter.
 7. Auto-refresh the history list after successful extraction.
 8. The API base URL is hardcoded in the JS as the API Gateway endpoint.
 9. `siteBaseUrl` is derived from `window.location.origin` to construct image URLs (same S3 bucket).

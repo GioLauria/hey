@@ -71,6 +71,19 @@ function showOverlay(text, title, imageKey, ocrData) {
   overlayTitle.innerText = title;
   currentExtractionId = ocrData ? ocrData.id : null;
 
+  // Download link
+  if (imageKey) {
+    const downloadLink = document.getElementById('downloadLink');
+    const downloadBtn = document.getElementById('downloadBtn');
+    if (downloadLink && downloadBtn) {
+      downloadBtn.href = imageBaseUrl + '/' + encodeURIComponent(imageKey);
+      downloadLink.style.display = 'block';
+    }
+  } else {
+    const downloadLink = document.getElementById('downloadLink');
+    if (downloadLink) downloadLink.style.display = 'none';
+  }
+
   // Confidence bar
   if (ocrData && ocrData.avg_confidence !== undefined && confidenceBar && confidenceFill && confidenceLabel) {
     const avg = ocrData.avg_confidence;
