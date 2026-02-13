@@ -9,6 +9,24 @@ input[type="file"] { flex: 1; min-width: 180px; }
 button { padding: 10px 24px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
 button:hover { background: #1d4ed8; }
 button:disabled { background: #94a3b8; cursor: not-allowed; }
+
+/* Upload area */
+.upload-area { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 20px; text-align: center; transition: border-color 0.3s, background-color 0.3s; cursor: pointer; width: 100%; margin-bottom: 10px; }
+.upload-area:hover, .upload-area.dragover { border-color: #2563eb; background-color: #eff6ff; }
+.upload-content { display: flex; flex-direction: column; align-items: center; }
+.upload-icon { font-size: 2rem; margin-bottom: 8px; }
+.upload-link { color: #2563eb; cursor: pointer; text-decoration: underline; }
+.upload-link:hover { color: #1d4ed8; }
+.upload-hint { font-size: 0.85rem; color: #666; margin-top: 4px; }
+
+/* File preview */
+.file-preview { display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0; }
+.file-info { flex: 1; }
+.file-info strong { display: block; color: #1e293b; }
+.file-info small { color: #64748b; }
+.remove-file { background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.remove-file:hover { background: #dc2626; }
+
 #status { margin-top: 16px; color: #555; font-size: 0.95rem; }
 
 /* Progress bar */

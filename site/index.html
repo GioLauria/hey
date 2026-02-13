@@ -13,8 +13,23 @@
     <img src="hey.png" alt="Hey Logo" class="logo">
     <h1>Upload an Image for OCR</h1>
     <form id="uploadForm">
-      <input type="file" id="imageInput" accept="image/*,.pdf" required />
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-content">
+          <div id="filePreview" class="file-preview" style="display:none">
+            <img id="imagePreview" alt="Preview" style="max-width:200px; max-height:200px; display:none">
+            <div id="fileInfo" class="file-info"></div>
+            <button type="button" id="removeFile" class="remove-file">×</button>
+          </div>
+          <div id="uploadPrompt">
+            <div class="upload-icon">📁</div>
+            <p>Drag & drop an image or PDF here, or <label for="imageInput" class="upload-link">browse files</label></p>
+            <p class="upload-hint">Supported formats: PNG, JPG, JPEG, PDF (max 10MB)</p>
+          </div>
+        </div>
+        <input type="file" id="imageInput" accept="image/png,image/jpeg,image/jpg,application/pdf,.pdf" style="display:none" />
+      </div>
       <select id="restaurantSelect" required>
+        <option value="">Loading restaurants...</option>
       </select>
       <button type="submit" id="submitBtn">Extract Text</button>
     </form>

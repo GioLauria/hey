@@ -13,24 +13,120 @@ const imageBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.imageBaseUrl) || si
 
 let currentExtractionId = null;
 
-// Restaurant data from tblRistoranti
-const restaurants = [
-  { id: 1, name: 'Trattoria Roma' },
-  { id: 2, name: 'Pizzeria Napoli' },
-  { id: 3, name: 'Osteria Milano' },
-  { id: 4, name: 'Ristorante Firenze' },
-  { id: 5, name: 'Bar Torino' }
-];
+// File upload state
+let selectedFile = null;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
 
-function populateRestaurantSelect() {
-  const select = document.getElementById('restaurantSelect');
-  select.innerHTML = '<option value="">Select Restaurant</option>';
-  restaurants.forEach(r => {
-    const option = document.createElement('option');
-    option.value = r.id;
-    option.textContent = r.name;
-    select.appendChild(option);
+// File validation
+function validateFile(file) {
+  if (!file) return 'Please select a file.';
+  
+  if (file.size > MAX_FILE_SIZE) {
+    return `File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the maximum limit of 10MB.`;
+  }
+  
+  if (!ALLOWED_TYPES.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
+    return 'Please select a valid image file (PNG, JPG, JPEG) or PDF document.';
+  }
+  
+  return null;
+}
+
+// File preview and display
+function displayFile(file) {
+  selectedFile = file;
+  const uploadArea = document.getElementById('uploadArea');
+  const uploadPrompt = document.getElementById('uploadPrompt');
+  const filePreview = document.getElementById('filePreview');
+  const imagePreview = document.getElementById('imagePreview');
+  const fileInfo = document.getElementById('fileInfo');
+  
+  uploadPrompt.style.display = 'none';
+  filePreview.style.display = 'flex';
+  
+  // Show image preview for images
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      imagePreview.src = e.target.result;
+      imagePreview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    imagePreview.style.display = 'none';
+  }
+  
+  // File info
+  const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+  fileInfo.innerHTML = `
+    <strong>${file.name}</strong>
+    <small>${sizeMB} MB • ${file.type || 'PDF'}</small>
+  `;
+  
+  // Update input
+  document.getElementById('imageInput').files = new DataTransfer().files;
+}
+
+// Remove file
+function removeFile() {
+  selectedFile = null;
+  const uploadPrompt = document.getElementById('uploadPrompt');
+  const filePreview = document.getElementById('filePreview');
+  const imagePreview = document.getElementById('imagePreview');
+  
+  uploadPrompt.style.display = 'block';
+  filePreview.style.display = 'none';
+  imagePreview.style.display = 'none';
+  document.getElementById('imageInput').value = '';
+}
+
+// Drag and drop functionality
+function setupDragAndDrop() {
+  const uploadArea = document.getElementById('uploadArea');
+  
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, preventDefaults, false);
   });
+  
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  ['dragenter', 'dragover'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, highlight, false);
+  });
+  
+  ['dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, unhighlight, false);
+  });
+  
+  function highlight() {
+    uploadArea.classList.add('dragover');
+  }
+  
+  function unhighlight() {
+    uploadArea.classList.remove('dragover');
+  }
+  
+  uploadArea.addEventListener('drop', handleDrop, false);
+  
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length > 0) {
+      const file = files[0];
+      const error = validateFile(file);
+      if (error) {
+        statusEl.innerText = error;
+        return;
+      }
+      displayFile(file);
+      statusEl.innerText = '';
+    }
+  }
 }
 
 function setProgress(pct, label) {
@@ -513,6 +609,8 @@ document.addEventListener('DOMContentLoaded', function() {
   confidenceFill = document.getElementById('confidenceFill');
   confidenceLabel = document.getElementById('confidenceLabel');
 
+  // Setup event listeners
+  overlay.onclick = function(e) { if (e.target === overlay) hideOverlay(); };
   document.getElementById('overlayClose').onclick = hideOverlay;
   document.getElementById('closeBtn').onclick = hideOverlay;
   document.getElementById('copyBtn').onclick = function() {
@@ -521,38 +619,75 @@ document.addEventListener('DOMContentLoaded', function() {
     this.innerText = 'Copied!';
     setTimeout(() => { this.innerText = 'Copy Text'; }, 1500);
   };
-  overlay.onclick = function(e) { if (e.target === overlay) hideOverlay(); };
+
+  // File input handling
+  document.getElementById('imageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const error = validateFile(file);
+      if (error) {
+        statusEl.innerText = error;
+        return;
+      }
+      displayFile(file);
+      statusEl.innerText = '';
+    }
+  });
+
+  // Remove file button
+  document.getElementById('removeFile').addEventListener('click', removeFile);
+
+  // Setup drag and drop
+  setupDragAndDrop();
 
   form.onsubmit = async function(e) {
     e.preventDefault();
-    const file = document.getElementById('imageInput').files[0];
+    const file = selectedFile;
     const restaurant = document.getElementById('restaurantSelect').value;
-    if (!file) return;
+    
+    if (!file) {
+      statusEl.innerText = 'Please select a file to upload.';
+      return;
+    }
+    
+    // Validate file again (in case it was modified)
+    const validationError = validateFile(file);
+    if (validationError) {
+      statusEl.innerText = validationError;
+      return;
+    }
+    
     if (!restaurant) {
       statusEl.innerText = 'Please select a restaurant.';
       return;
     }
+    
     submitBtn.disabled = true;
     statusEl.innerText = '';
 
     try {
-      setProgress(5, 'Computing file hash...');
+      setProgress(5, 'Validating file...');
+      
+      setProgress(10, 'Computing file hash...');
       const hash = await computeSHA256(file);
 
-      setProgress(10, 'Getting upload URL...');
+      setProgress(15, 'Checking for duplicates...');
       const presignRes = await fetch(`${apiUrl}/presign?key=${encodeURIComponent(file.name)}&hash=${hash}&restaurant=${encodeURIComponent(restaurant)}`);
       if (!presignRes.ok) {
         if (presignRes.status === 409) {
-          statusEl.innerText = 'This image has already been processed.';
+          statusEl.innerText = '❌ This image has already been processed.';
+          setProgress(0, '');
         } else {
-          statusEl.innerText = 'Failed to get upload URL.';
+          const errorText = await presignRes.text();
+          statusEl.innerText = `❌ Failed to get upload URL: ${errorText}`;
+          setProgress(0, '');
         }
         resetUI();
         return;
       }
       const { url, s3_key } = await presignRes.json();
 
-      setProgress(30, 'Uploading image...');
+      setProgress(30, 'Uploading file...');
       const uploadRes = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/octet-stream' },
@@ -560,32 +695,39 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       if (!uploadRes.ok) {
         const errText = await uploadRes.text();
-        statusEl.innerText = 'Upload failed: ' + errText;
+        statusEl.innerText = `❌ Upload failed: ${errText}`;
+        setProgress(0, '');
         resetUI();
         return;
       }
-      setProgress(50, 'Image uploaded. Starting OCR...');
+      
+      setProgress(60, 'File uploaded successfully. Starting OCR...');
 
-      setProgress(60, 'Extracting text from image...');
+      setProgress(70, 'Extracting text from document...');
       const ocrRes = await fetch(`${apiUrl}/ocr?s3_key=${encodeURIComponent(s3_key)}`);
-      setProgress(80, 'Processing...');
+      setProgress(85, 'Processing OCR results...');
       if (!ocrRes.ok) {
         const errBody = await ocrRes.text();
-        statusEl.innerText = 'OCR failed: ' + ocrRes.status + ' ' + errBody;
+        statusEl.innerText = `❌ OCR failed: ${ocrRes.status} ${errBody}`;
+        setProgress(0, '');
         resetUI();
         return;
       }
       const ocrData = await ocrRes.json();
-      setProgress(100, 'Done!');
+      
+      setProgress(100, '✅ Processing complete!');
 
-      const txt = ocrData.text && ocrData.text.trim().length > 0 ? ocrData.text : '(No text detected in this image)';
-      showOverlay(txt, 'Extracted Text \u2014 ' + file.name, s3_key, ocrData);
-      statusEl.innerText = ocrData.text && ocrData.text.trim().length > 0 ? 'Text extracted successfully!' : 'No text found in the image.';
+      const txt = ocrData.text && ocrData.text.trim().length > 0 ? ocrData.text : '(No text detected in this document)';
+      showOverlay(txt, 'Extracted Text — ' + file.name, s3_key, ocrData);
+      statusEl.innerText = ocrData.text && ocrData.text.trim().length > 0 ? 
+        '✅ Text extracted successfully!' : 
+        '⚠️ No text found in the document.';
 
       loadHistory();
     } catch (err) {
-      statusEl.innerText = 'Error: ' + err.message;
-      console.error(err);
+      statusEl.innerText = `❌ Error: ${err.message}`;
+      console.error('Upload error:', err);
+      setProgress(0, '');
     }
     resetUI();
   };
@@ -608,6 +750,8 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch(e) { console.error('Counter error:', e); }
   })();
 
+  updateCacheDisplay();
+  populateRestaurantSelect();
   loadHistory();
 });
 
@@ -633,49 +777,6 @@ function updateCacheDisplay() {
   }
 }
 
-function updateCacheTime() {
-  const select = document.getElementById('cacheTimeSelect');
-  currentCacheMinutes = parseInt(select.value);
-  updateCacheDisplay();
-
-  // Note: This only updates the display. Actual CloudFront TTL would need to be changed via API
-  console.log(`Cache time updated to ${currentCacheMinutes} minutes`);
-}
-
-async function invalidateCache() {
-  const btn = document.getElementById('immediateRefreshBtn');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = 'Refreshing...';
-  btn.disabled = true;
-
-  try {
-    const response = await fetch(`${apiUrl}/cache/invalidate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        paths: ['/*']  // Invalidate all paths
-      })
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Cache invalidation created:', data);
-      alert(`Cache refresh initiated! Status: ${data.status}\nInvalidation ID: ${data.invalidation_id}`);
-    } else {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to invalidate cache');
-    }
-  } catch (err) {
-    console.error('Cache invalidation failed:', err);
-    alert('Failed to refresh cache: ' + err.message);
-  } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }
-}
-
 // Initialize cache display
 document.addEventListener('DOMContentLoaded', function() {
   updateCacheDisplay();
@@ -698,14 +799,8 @@ async function populateRestaurantSelect() {
     });
   } catch (error) {
     console.error('Error loading restaurants:', error);
-    // Fallback to hardcoded
-    select.innerHTML = '<option value="">Select Restaurant</option>';
-    restaurants.forEach(r => {
-      const option = document.createElement('option');
-      option.value = r.id;
-      option.textContent = r.name;
-      select.appendChild(option);
-    });
+    select.innerHTML = '<option value="">❌ Failed to load restaurants</option>';
+    statusEl.innerText = '❌ Unable to load restaurant list. Please refresh the page.';
   }
 }
 

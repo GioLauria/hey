@@ -77,10 +77,34 @@ project_name = "HeyAWS"
 
 ### 5. Deploy dell'infrastruttura
 ```bash
+cd terraform
 terraform init
 terraform plan
 terraform apply
 ```
+
+## 🌐 Stato Deploy Corrente (Febbraio 2026)
+
+L'infrastruttura è stata deployata e testata. Endpoint disponibili:
+
+### API Endpoints
+- **API Gateway**: `https://5rn8owqjwf.execute-api.eu-west-2.amazonaws.com`
+- **S3 Website**: `http://ocr-site-31145dac.s3-website.eu-west-2.amazonaws.com`
+- **S3 Bucket**: `ocr-site-31145dac`
+
+### Servizi AWS Deployati
+- ✅ **API Gateway** con 6 routes (GET/POST/PUT)
+- ✅ **Lambda Functions**: validate-text, visitor-stats (+ altre in deploy)
+- ✅ **DynamoDB Tables**: ocr-extractions, ocr-visitors, menu-items, ocr-todos
+- ✅ **RDS PostgreSQL**: Database per gestione ristoranti
+- ✅ **S3 Bucket**: Hosting sito statico con CloudFront
+- ✅ **VPC**: Rete isolata con subnet private/public
+- ✅ **WAF**: Protezione sicurezza per il sito web
+
+### Come Accedere
+1. **Sito Web**: Visita l'URL S3 website per l'interfaccia utente
+2. **API**: Usa l'API Gateway URL per chiamate backend
+3. **Database**: PostgreSQL accessibile via Lambda functions
 
 ## 🔒 Sicurezza e Credenziali
 

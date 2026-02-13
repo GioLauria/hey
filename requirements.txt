@@ -5,6 +5,7 @@ python-dotenv>=1.0.0
 
 # For PDF processing
 pypdf>=4.0.0
+Pillow>=10.0.0
 
 # Development dependencies
 pytest>=7.0.0

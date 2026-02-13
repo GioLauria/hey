@@ -2,6 +2,24 @@
 
 This repository contains an OCR (Optical Character Recognition) web application built with AWS services using Terraform for infrastructure as code.
 
+## Current Deployment Status (February 2026)
+
+The infrastructure has been successfully deployed and is operational:
+
+### 🚀 Live Endpoints
+- **API Gateway**: `https://5rn8owqjwf.execute-api.eu-west-2.amazonaws.com`
+- **S3 Website**: `http://ocr-site-31145dac.s3-website.eu-west-2.amazonaws.com`
+- **S3 Bucket**: `ocr-site-31145dac`
+
+### ✅ Deployed Services
+- **API Gateway** with 6 routes (GET/POST/PUT endpoints)
+- **Lambda Functions**: validate-text, visitor-stats (additional functions deploying)
+- **DynamoDB Tables**: ocr-extractions, ocr-visitors, menu-items, ocr-todos
+- **RDS PostgreSQL**: Restaurant management database
+- **S3 + CloudFront**: Static website hosting with CDN
+- **VPC Network**: Isolated network with private/public subnets
+- **WAF Security**: Web application firewall protection
+
 ## Features
 
 - Upload images and PDFs to extract text using AWS Textract
