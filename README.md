@@ -65,6 +65,7 @@ cp terraform.tfvars.example terraform.tfvars
 Modifica `terraform.tfvars` con i tuoi valori:
 ```hcl
 # Database password
+db_username = "postgres"
 db_password = "your-secure-password-here"
 
 # AWS Region
