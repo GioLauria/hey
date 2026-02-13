@@ -6,7 +6,7 @@ console.log('Script loaded, current URL:', window.location.href);
 if (isLocalDevelopment) {
   console.warn('Running on HTTP - To-Do list may not work due to mixed content policy. Use production site: https://d1qc6fbrksmxtc.cloudfront.net');
 }
-let form, statusEl, progressWrap, progressBar, submitBtn, overlay, overlayTitle, overlayImage, historyList, confText, editArea, saveBtn, confidenceBar, confidenceFill, confidenceLabel;
+let form, statusEl, progressWrap, progressBar, submitBtn, overlay, overlayTitle, historyList, confText, editArea, saveBtn, confidenceBar, confidenceFill, confidenceLabel;
 const siteBaseUrl = window.location.origin;
 const apiUrl = (window.APP_CONFIG && window.APP_CONFIG.apiUrl) || "https://nrnnywp9u0.execute-api.eu-west-2.amazonaws.com";
 const imageBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.imageBaseUrl) || siteBaseUrl;
@@ -66,15 +66,6 @@ function switchTab(tab) {
 function showOverlay(text, title, imageKey, ocrData) {
   overlayTitle.innerText = title;
   currentExtractionId = ocrData ? ocrData.id : null;
-
-  // Image
-  if (imageKey) {
-    overlayImage.src = imageBaseUrl + '/' + encodeURIComponent(imageKey);
-    overlayImage.style.display = 'block';
-  } else {
-    overlayImage.style.display = 'none';
-    overlayImage.src = '';
-  }
 
   // Confidence bar
   if (ocrData && ocrData.avg_confidence !== undefined) {
@@ -146,14 +137,15 @@ async function loadHistory() {
       const conf = item.avg_confidence !== undefined ? ` &bull; ${item.avg_confidence}%` : '';
       const corrected = item.corrected ? '<span class="badge-corrected">Corrected</span>' : '';
       const fileWarning = item.file_exists === false ? '<span class="file-warning" title="Original file not found in S3">⚠️ File Missing</span>' : '';
-      const thumbnailHtml = item.thumbnail_key ? `<img class="history-thumbnail" src="${imageBaseUrl}/${item.thumbnail_key}" alt="PDF Preview" onerror="this.style.display='none'">` : '';
       li.innerHTML = `
-        ${thumbnailHtml}
         <div class="history-item-info">
           <div class="history-item-name">${escapeHtml(item.filename)}${corrected}${fileWarning}</div>
           <div class="history-item-meta">${formatDate(item.timestamp)} &mdash; ${lines} line${lines !== 1 ? 's' : ''}${conf}</div>
         </div>
-        <button class="history-item-btn" onclick="viewExtraction(this)" data-text="${escapeAttr(item.text)}" data-filename="${escapeAttr(item.filename)}" data-s3-key="${escapeAttr(item.s3_key)}" data-timestamp="${escapeAttr(item.timestamp)}" data-id="${escapeAttr(item.id)}" data-conf="${item.avg_confidence || ''}">View</button>
+        <div class="history-item-actions">
+          <button class="history-item-btn" onclick="viewExtraction(this)" data-text="${escapeAttr(item.text)}" data-filename="${escapeAttr(item.filename)}" data-s3-key="${escapeAttr(item.s3_key)}" data-timestamp="${escapeAttr(item.timestamp)}" data-id="${escapeAttr(item.id)}" data-conf="${item.avg_confidence || ''}">View</button>
+          <button class="history-item-download" onclick="downloadExtraction(this)" data-s3-key="${escapeAttr(item.s3_key)}" data-filename="${escapeAttr(item.filename)}" title="Download Original File">📥</button>
+        </div>
         <button class="history-item-delete" onclick="deleteExtraction(this)" data-id="${escapeAttr(item.id)}" title="Delete">&times;</button>
       `;
       historyList.appendChild(li);
@@ -186,6 +178,19 @@ function viewExtraction(btn) {
     lines: null
   };
   showOverlay(text, filename + ' \u2014 ' + formatDate(timestamp), s3Key, ocrData);
+}
+
+function downloadExtraction(btn) {
+  const s3Key = btn.getAttribute('data-s3-key');
+  const filename = btn.getAttribute('data-filename');
+  if (s3Key) {
+    const link = document.createElement('a');
+    link.href = imageBaseUrl + '/' + encodeURIComponent(s3Key);
+    link.download = filename || 'download';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
 
 async function deleteExtraction(btn) {
@@ -496,7 +501,6 @@ document.addEventListener('DOMContentLoaded', function() {
   submitBtn = document.getElementById('submitBtn');
   overlay = document.getElementById('overlay');
   overlayTitle = document.getElementById('overlayTitle');
-  overlayImage = document.getElementById('overlayImage');
   historyList = document.getElementById('historyList');
   confText = document.getElementById('confText');
   editArea = document.getElementById('editArea');
