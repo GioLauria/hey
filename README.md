@@ -87,11 +87,6 @@ terraform apply
 
 L'infrastruttura è stata deployata e testata. Endpoint disponibili:
 
-### API Endpoints
-- **API Gateway**: `https://5rn8owqjwf.execute-api.eu-west-2.amazonaws.com`
-- **S3 Website**: `http://ocr-site-31145dac.s3-website.eu-west-2.amazonaws.com`
-- **S3 Bucket**: `ocr-site-31145dac`
-
 ### Servizi AWS Deployati
 - ✅ **API Gateway** con 6 routes (GET/POST/PUT)
 - ✅ **Lambda Functions**: validate-text, visitor-stats (+ altre in deploy)
