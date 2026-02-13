@@ -9,6 +9,9 @@ Un sistema completo per la gestione di ristoranti con funzionalità OCR per l'es
 - **Archiviazione Cloud**: AWS S3 per documenti e immagini
 - **API Serverless**: AWS Lambda per elaborazione backend
 - **Frontend Web**: Interfaccia utente per upload e visualizzazione risultati
+- **Storico Estrazioni**: Visualizza e scarica file elaborati in precedenza
+- **Analisi NLP**: Validazione testo con Amazon Comprehend
+- **Monitoraggio Costi**: Dashboard per costi AWS in tempo reale
 
 ## 📋 Prerequisiti
 
