@@ -16,8 +16,9 @@ This repository contains an OCR (Optical Character Recognition) web application 
 
 1. Clone the repository
 2. Copy `terraform.tfvars.example` to `terraform.tfvars` and configure your database credentials
-3. Run `terraform init`, `terraform plan`, `terraform apply`
-4. Access the website via the CloudFront URL output
+3. Navigate to the `terraform/` directory
+4. Run `terraform init`, `terraform plan`, `terraform apply`
+5. Access the website via the CloudFront URL output
 
 ## Architecture
 
@@ -30,6 +31,28 @@ The application uses a serverless architecture with the following AWS services:
 - RDS PostgreSQL for relational data
 - Textract for OCR processing
 - Comprehend for text analysis
+
+## Terraform Structure
+
+The infrastructure is organized into modular Terraform files in the `terraform/` directory:
+
+- `providers.tf` - AWS provider configurations and requirements
+- `variables.tf` - Input variables and defaults
+- `tags.tf` - Centralized tag management system
+- `vpc.tf` - VPC, subnets, security groups, and networking
+- `rds.tf` - PostgreSQL database instance and configuration
+- `s3.tf` - S3 bucket, website hosting, and static assets
+- `dynamodb.tf` - DynamoDB tables for data storage
+- `lambda.tf` - Lambda functions and IAM roles
+- `api_gateway.tf` - API Gateway configuration and routes
+- `cloudfront.tf` - CloudFront distribution and WAF
+
+### Centralized Tag Management
+
+All resources use a centralized tagging system defined in `tags.tf`:
+- **Common tags**: Project, Environment, ManagedBy, Owner
+- **Component-specific tags**: vpc, database, storage, compute, api, cdn, dynamodb
+- **Consistent tagging** across all AWS resources for cost tracking and management
 
 ## Development
 
@@ -93,7 +116,8 @@ cd hey
 #### Maintenance Rules
 - **ALWAYS update MAIN.md** after any infrastructure changes
 - **ALWAYS update the corresponding `scripts/<name>.md`** file when modifying Lambda or frontend code
-- Run `terraform apply` after infrastructure changes
+- **Update terraform files** in the `terraform/` directory for infrastructure changes
+- Run `terraform apply` after infrastructure changes from the `terraform/` directory
 - Ensure all commits are GPG signed
 - Keep the repository synchronized with AWS infrastructure
 
@@ -113,15 +137,25 @@ Use this prompt to recreate the entire project from scratch. Everything is manag
 
 Create a complete OCR web application using Terraform and AWS. Host everything in the **London region (eu-west-2)**. Always use the **cheapest service configuration** (pay-per-request DynamoDB, minimal Lambda memory, S3 static website hosting).
 
-### Infrastructure (single `main.tf` file)
+### Infrastructure (modular Terraform files)
 
-Use Terraform with AWS provider >= 5.0. All resources go in a single `main.tf` file. Use `random_id` for unique S3 bucket naming (`ocr-site-<hex>`). Output the API Gateway endpoint URL, the CloudFront distribution URL, the S3 website URL, and the RDS endpoint URL.
+Use Terraform with AWS provider >= 5.0. Infrastructure is organized into modular files in the `terraform/` directory for better maintainability. Use `random_id` for unique S3 bucket naming (`ocr-site-<hex>`). Output the API Gateway endpoint URL, the CloudFront distribution URL, the S3 website URL, and the RDS endpoint URL.
 
 **Provider Configuration:**
 
 - AWS provider with `region = "eu-west-2"`.
 - Additional AWS provider aliased as `us-east-1` with `region = "us-east-1"` for CloudFront and WAF services.
-- `default_tags` block with `Project = "HeyAWS"` tag applied to all resources. This tag is used by the Cost Explorer Lambda to dynamically discover which AWS services belong to this project.
+- Centralized tag management in `tags.tf` with component-specific tagging applied to all resources.
+
+**S3 Bucket:**
+
+- S3 bucket with `force_destroy = true` for static website hosting (index.html).
+- S3 website configuration with `index.html` as the index document.
+- S3 CORS configuration: allow GET, PUT, POST, HEAD from all origins, expose ETag header.
+- S3 lifecycle configuration: delete objects in `uploads/` prefix after 24 hours, and `r/` prefix after 24 hours to clean up uploaded images.
+- Disable all public access blocks (block_public_acls, block_public_policy, ignore_public_acls, restrict_public_buckets all false).
+- S3 bucket policy allowing `s3:GetObject` and `s3:PutObject` for all principals on bucket objects, plus CloudFront Origin Access Identity access.
+- S3 object resources for `index.html`, `config.js`, `styles.css`, `script.js`, and `stats.html` uploaded from `site/` directory with appropriate content types and `etag = filemd5(...)` so Terraform detects content changes and re-uploads.
 
 **S3 Bucket:**
 
