@@ -64,6 +64,10 @@ function switchTab(tab) {
 }
 
 function showOverlay(text, title, imageKey, ocrData) {
+  if (!overlay || !overlayTitle || !confText || !editArea) {
+    console.error('Overlay elements not ready');
+    return;
+  }
   overlayTitle.innerText = title;
   currentExtractionId = ocrData ? ocrData.id : null;
 
