@@ -85,8 +85,6 @@ terraform apply
 
 ## 🌐 Stato Deploy Corrente (Febbraio 2026)
 
-L'infrastruttura è stata deployata e testata. Endpoint disponibili:
-
 ### Servizi AWS Deployati
 - ✅ **API Gateway** con 6 routes (GET/POST/PUT)
 - ✅ **Lambda Functions**: validate-text, visitor-stats (+ altre in deploy)
