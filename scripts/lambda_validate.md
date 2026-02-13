@@ -14,6 +14,16 @@ Performs **NLP (Natural Language Processing) validation** on extracted text usin
   - `detect_sentiment`
   - `detect_syntax`
 
+## Configuration
+- **Memory**: 128 MB
+- **Timeout**: 15 seconds
+- **Runtime**: Python 3.11
+
+## IAM Permissions
+Uses AWS managed policies:
+- **AWSLambdaBasicExecutionRole**: CloudWatch Logs
+- **ComprehendFullAccess**: NLP operations
+
 ## Environment Variables
 None.
 

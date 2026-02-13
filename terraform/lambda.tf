@@ -14,34 +14,19 @@ resource "aws_iam_role" "presign_lambda" {
   })
 }
 
-resource "aws_iam_role_policy" "presign_lambda_policy" {
-  name = "presign-lambda-policy"
-  role = aws_iam_role.presign_lambda.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = ["s3:PutObject"],
-        Resource = "${aws_s3_bucket.site.arn}/*"
-      },
-      {
-        Effect = "Allow",
-        Action = ["dynamodb:Scan"],
-        Resource = aws_dynamodb_table.extractions.arn
-      },
-      {
-        Effect = "Allow",
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-        Resource = "arn:aws:logs:*:*:*"
-      },
-      {
-        Effect = "Allow",
-        Action = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterfaces", "ec2:DeleteNetworkInterface"],
-        Resource = "*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "presign_lambda_basic" {
+  role       = aws_iam_role.presign_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "presign_lambda_s3" {
+  role       = aws_iam_role.presign_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "presign_lambda_dynamodb" {
+  role       = aws_iam_role.presign_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
 }
 
 data "archive_file" "presign_lambda_zip" {
@@ -72,10 +57,6 @@ resource "aws_lambda_function" "presign" {
   }
   timeout     = 10
   memory_size = 128
-  vpc_config {
-    subnet_ids         = [aws_subnet.rds_subnet1.id, aws_subnet.rds_subnet2.id]
-    security_group_ids = [aws_security_group.rds_sg.id]
-  }
 }
 
 # --- OCR Lambda ---
@@ -92,39 +73,24 @@ resource "aws_iam_role" "ocr_lambda" {
   })
 }
 
-resource "aws_iam_role_policy" "ocr_lambda_policy" {
-  name = "ocr-lambda-policy"
-  role = aws_iam_role.ocr_lambda.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"],
-        Resource = ["${aws_s3_bucket.site.arn}/*", aws_s3_bucket.site.arn]
-      },
-      {
-        Effect   = "Allow",
-        Action   = ["textract:DetectDocumentText", "textract:AnalyzeDocument"],
-        Resource = "*"
-      },
-      {
-        Effect   = "Allow",
-        Action   = ["dynamodb:PutItem", "dynamodb:Scan"],
-        Resource = aws_dynamodb_table.extractions.arn
-      },
-      {
-        Effect   = "Allow",
-        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-        Resource = "arn:aws:logs:*:*:*"
-      },
-      {
-        Effect = "Allow",
-        Action = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterfaces", "ec2:DeleteNetworkInterface"],
-        Resource = "*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "ocr_lambda_basic" {
+  role       = aws_iam_role.ocr_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "ocr_lambda_s3" {
+  role       = aws_iam_role.ocr_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ocr_lambda_textract" {
+  role       = aws_iam_role.ocr_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonTextractFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ocr_lambda_dynamodb" {
+  role       = aws_iam_role.ocr_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
 data "archive_file" "ocr_lambda_zip" {
@@ -148,7 +114,7 @@ resource "aws_lambda_function" "ocr" {
     }
   }
   timeout     = 120
-  memory_size = 1024
+  memory_size = 128
 }
 
 # --- List Extractions Lambda ---
@@ -165,29 +131,19 @@ resource "aws_iam_role" "list_lambda" {
   })
 }
 
-resource "aws_iam_role_policy" "list_lambda_policy" {
-  name = "list-extractions-lambda-policy"
-  role = aws_iam_role.list_lambda.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = ["dynamodb:Scan", "dynamodb:GetItem", "dynamodb:DeleteItem", "dynamodb:UpdateItem"],
-        Resource = aws_dynamodb_table.extractions.arn
-      },
-      {
-        Effect   = "Allow",
-        Action   = ["s3:GetObject"],
-        Resource = "${aws_s3_bucket.site.arn}/*"
-      },
-      {
-        Effect   = "Allow",
-        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "list_lambda_basic" {
+  role       = aws_iam_role.list_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "list_lambda_dynamodb" {
+  role       = aws_iam_role.list_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "list_lambda_s3" {
+  role       = aws_iam_role.list_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
 data "archive_file" "list_lambda_zip" {
@@ -227,30 +183,14 @@ resource "aws_iam_role" "validate_lambda" {
   })
 }
 
-resource "aws_iam_role_policy" "validate_lambda_policy" {
-  name = "validate-lambda-policy"
-  role = aws_iam_role.validate_lambda.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = [
-          "comprehend:DetectDominantLanguage",
-          "comprehend:DetectEntities",
-          "comprehend:DetectKeyPhrases",
-          "comprehend:DetectSentiment",
-          "comprehend:DetectSyntax"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect   = "Allow",
-        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "validate_lambda_basic" {
+  role       = aws_iam_role.validate_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "validate_lambda_comprehend" {
+  role       = aws_iam_role.validate_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/ComprehendFullAccess"
 }
 
 data "archive_file" "validate_lambda_zip" {
@@ -284,24 +224,14 @@ resource "aws_iam_role" "counter_lambda" {
   })
 }
 
-resource "aws_iam_role_policy" "counter_lambda_policy" {
-  name = "counter-lambda-policy"
-  role = aws_iam_role.counter_lambda.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:Scan"],
-        Resource = aws_dynamodb_table.visitors.arn
-      },
-      {
-        Effect   = "Allow",
-        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "counter_lambda_basic" {
+  role       = aws_iam_role.counter_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "counter_lambda_dynamodb" {
+  role       = aws_iam_role.counter_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
 data "archive_file" "counter_lambda_zip" {
@@ -340,24 +270,14 @@ resource "aws_iam_role" "stats_lambda" {
   })
 }
 
-resource "aws_iam_role_policy" "stats_lambda_policy" {
-  name = "stats-lambda-policy"
-  role = aws_iam_role.stats_lambda.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:Scan"],
-        Resource = aws_dynamodb_table.visitors.arn
-      },
-      {
-        Effect   = "Allow",
-        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "stats_lambda_basic" {
+  role       = aws_iam_role.stats_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "stats_lambda_dynamodb" {
+  role       = aws_iam_role.stats_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
 data "archive_file" "stats_lambda_zip" {

@@ -12,11 +12,29 @@ Performs **OCR (Optical Character Recognition)** on images and PDFs stored in S3
 - **DynamoDB** — `put_item` to persist extraction results, `scan` to check for duplicates
 - **S3** — `get_object` to read files for processing and hashing, `delete_object` to remove duplicates
 
+## Configuration
+- **Memory**: 128 MB (optimized for cost)
+- **Timeout**: 120 seconds
+- **Runtime**: Python 3.11
+
+## IAM Permissions
+Uses AWS managed policies:
+- **AWSLambdaBasicExecutionRole**: CloudWatch Logs
+- **AmazonS3FullAccess**: S3 operations
+- **AmazonTextractFullAccess**: OCR processing
+- **AmazonDynamoDBFullAccess**: DynamoDB operations
+
 ## Environment Variables
 | Variable     | Description |
 |--------------|-------------|
 | `BUCKET`     | S3 bucket name containing uploaded files |
 | `TABLE_NAME` | DynamoDB table name (`ocr-extractions`) |
+| `DB_HOST`    | PostgreSQL database host |
+
+## Input
+| Parameter | Source | Required | Description |
+|-----------|--------|----------|-------------|
+| `s3_key`  | Query string | Yes | The full S3 key of the file to process (e.g., r/turin/turin_delcambio_1234/uuid/filename.pdf) |
 
 ## Input
 | Parameter | Source | Required | Description |

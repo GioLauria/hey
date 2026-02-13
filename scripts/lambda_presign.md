@@ -9,12 +9,20 @@ Generates a **presigned S3 PUT URL** so the browser can upload images directly t
 ## AWS Services Used
 - **S3** — `generate_presigned_url` with `put_object` method
 - **DynamoDB** — `scan` to check for existing hashes
+- **RDS PostgreSQL** — Query restaurant details
 
 ## Environment Variables
 | Variable | Description |
 |----------|-------------|
 | `BUCKET` | Name of the S3 bucket to upload to |
 | `TABLE_NAME` | Name of the DynamoDB table for extractions |
+| `DB_HOST` | PostgreSQL database host |
+
+## IAM Permissions
+Uses AWS managed policies:
+- **AWSLambdaBasicExecutionRole**: CloudWatch Logs
+- **AmazonS3FullAccess**: S3 operations
+- **AmazonDynamoDBReadOnlyAccess**: DynamoDB scanning
 
 ## Input
 | Parameter | Source | Required | Description |
@@ -36,8 +44,8 @@ Or on duplicate:
 1. Creates an S3 client with **explicit regional endpoint** (`https://s3.eu-west-2.amazonaws.com`) and `s3v4` signature version.
 2. Reads `key`, `hash`, and `restaurant` from `event.queryStringParameters`.
 3. Returns 400 if `key`, `hash`, or `restaurant` is missing.
-4. Queries PostgreSQL to get restaurant details using the `restaurant` ID.
-5. Scans DynamoDB extractions table for items with matching `hash` (currently disabled for debugging).
+4. Queries PostgreSQL database to get restaurant details using the `restaurant` ID.
+5. Scans DynamoDB extractions table for items with matching `hash`.
 6. If duplicate found, returns 409 with error message.
 7. If no duplicate, constructs S3 key as `"r/{restaurant_id}/{key}"`.
 8. Calls `generate_presigned_url` for `put_object` with:
@@ -48,6 +56,7 @@ Or on duplicate:
 ## Critical Notes
 - **Must use regional endpoint** — the global `s3.amazonaws.com` endpoint causes CORS preflight failures on regional buckets.
 - **Must use `s3v4` signature** — required for regional endpoints in `eu-west-2`.
+- **No VPC attachment** — Runs outside VPC for cost optimization, connects to public RDS.
 - The `ContentType` in the presigned URL must match the `Content-Type` header the browser sends when uploading, or S3 returns 403.
 - **Hash check prevents duplicate processing** — saves costs by avoiding redundant Textract calls and storage.
 

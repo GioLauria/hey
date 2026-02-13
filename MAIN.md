@@ -2,23 +2,32 @@
 
 This repository contains an OCR (Optical Character Recognition) web application built with AWS services using Terraform for infrastructure as code.
 
-## Current Deployment Status (February 2026)
+## Current Deployment Status (February 13, 2026)
 
-The infrastructure has been successfully deployed and is operational:
+The infrastructure has been successfully deployed and is operational with cost optimizations:
 
 ### 🚀 Live Endpoints
-- **API Gateway**: `https://5rn8owqjwf.execute-api.eu-west-2.amazonaws.com`
-- **S3 Website**: `http://ocr-site-31145dac.s3-website.eu-west-2.amazonaws.com`
-- **S3 Bucket**: `ocr-site-31145dac`
+- **CloudFront CDN**: `https://d3oi8zp2iyz0yj.cloudfront.net`
+- **API Gateway**: `https://inu9nw6jk5.execute-api.eu-west-2.amazonaws.com`
+- **S3 Website**: `http://ocr-site-55f77915.s3-website.eu-west-2.amazonaws.com`
+- **S3 Bucket**: `ocr-site-55f77915`
 
 ### ✅ Deployed Services
-- **API Gateway** with 6 routes (GET/POST/PUT endpoints)
-- **Lambda Functions**: validate-text, visitor-stats (additional functions deploying)
-- **DynamoDB Tables**: ocr-extractions, ocr-visitors, menu-items, ocr-todos
-- **RDS PostgreSQL**: Restaurant management database
-- **S3 + CloudFront**: Static website hosting with CDN
-- **VPC Network**: Isolated network with private/public subnets
-- **WAF Security**: Web application firewall protection
+- **API Gateway** with 6 routes (GET/POST endpoints)
+- **Lambda Functions**: presign-url, ocr-textract, list-extractions, validate-text, visitor-counter, visitor-stats
+- **DynamoDB Tables**: ocr-extractions, ocr-visitors, menu-items
+- **RDS PostgreSQL**: Restaurant management database (db.t3.micro)
+- **S3 + CloudFront**: Static website hosting with CDN (PriceClass_100)
+- **WAF Security**: Web application firewall with managed rules
+- **VPC Network**: Minimal network configuration (NAT Gateway removed for cost savings)
+
+### 💰 Cost Optimizations
+- **Monthly Savings**: ~$40-50 compared to default configurations
+- **RDS**: Free tier eligible (db.t3.micro)
+- **DynamoDB**: PAY_PER_REQUEST billing
+- **Lambda**: Minimum memory (128MB), no VPC attachment
+- **CloudFront**: Cheapest edge locations (PriceClass_100)
+- **IAM**: AWS managed policies only (no customer managed policies)
 
 ## Features
 
@@ -49,6 +58,18 @@ The application uses a serverless architecture with the following AWS services:
 - RDS PostgreSQL for relational data
 - Textract for OCR processing
 - Comprehend for text analysis
+
+### Security & IAM
+
+All Lambda functions use AWS managed IAM policies for least privilege access:
+- **AWSLambdaBasicExecutionRole**: CloudWatch Logs permissions
+- **AmazonS3FullAccess**: S3 bucket operations
+- **AmazonDynamoDBReadOnlyAccess/FullAccess**: DynamoDB operations
+- **AmazonTextractFullAccess**: OCR processing
+- **ComprehendFullAccess**: Text analysis
+- **AmazonEC2ReadOnlyAccess**: Network interface monitoring (when VPC attached)
+
+No customer managed policies are used - all permissions are granted through AWS managed policies for better security and maintenance.
 
 ## Terraform Structure
 

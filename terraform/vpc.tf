@@ -34,21 +34,6 @@ resource "aws_internet_gateway" "rds_igw" {
   })
 }
 
-resource "aws_eip" "nat_eip" {
-  domain = "vpc"
-  tags = merge(local.vpc_tags, {
-    Name = "nat-eip"
-  })
-}
-
-resource "aws_nat_gateway" "nat_gw" {
-  allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.rds_subnet1.id
-  tags = merge(local.vpc_tags, {
-    Name = "nat-gw"
-  })
-}
-
 resource "aws_route_table" "rds_rt" {
   vpc_id = aws_vpc.rds_vpc.id
   route {

@@ -10,6 +10,16 @@ Tracks **unique visitors by IP address** with comprehensive analytics data. Reco
 - **DynamoDB** — `put_item` (conditional), `update_item`, `scan` (count only)
 - **External API** — ipapi.co for geolocation data
 
+## Configuration
+- **Memory**: 128 MB
+- **Timeout**: 10 seconds
+- **Runtime**: Python 3.11
+
+## IAM Permissions
+Uses AWS managed policies:
+- **AWSLambdaBasicExecutionRole**: CloudWatch Logs
+- **AmazonDynamoDBFullAccess**: DynamoDB operations
+
 ## Environment Variables
 | Variable     | Description |
 |--------------|-------------|

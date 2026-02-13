@@ -6,7 +6,7 @@ locals {
     Project     = var.project_name
     Environment = "production"
     ManagedBy   = "Terraform"
-    Owner       = "Hey! Team"
+    Owner       = "Hey Team"
   }
 
   # Resource-specific tag functions

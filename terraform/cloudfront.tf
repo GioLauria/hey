@@ -14,6 +14,7 @@ resource "aws_cloudfront_distribution" "site" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
+  price_class         = "PriceClass_100"
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
@@ -54,7 +55,7 @@ resource "aws_cloudfront_origin_access_identity" "site" {
 
 resource "aws_wafv2_web_acl" "site" {
   provider    = aws.us-east-1
-  name        = "ocr-site-waf"
+  name        = "ocr-site-waf-v2"
   description = "WAF for OCR website protection"
   scope       = "CLOUDFRONT"
 

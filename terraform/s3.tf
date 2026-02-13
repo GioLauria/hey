@@ -30,35 +30,6 @@ resource "aws_s3_bucket_cors_configuration" "site_cors" {
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "site_lifecycle" {
-  bucket = aws_s3_bucket.site.id
-
-  rule {
-    id     = "delete_uploads_after_24h"
-    status = "Enabled"
-
-    filter {
-      prefix = "uploads/"
-    }
-
-    expiration {
-      days = 1
-    }
-  }
-
-  rule {
-    id     = "delete_restaurant_menus_after_24h"
-    status = "Enabled"
-
-    filter {
-      prefix = "r/"
-    }
-
-    expiration {
-      days = 1
-    }
-  }
-}
 
 resource "aws_s3_bucket_public_access_block" "site_pab" {
   bucket = aws_s3_bucket.site.id
