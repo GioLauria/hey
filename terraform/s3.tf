@@ -3,9 +3,9 @@
 resource "aws_s3_bucket" "site" {
   bucket = "ocr-site-${random_id.site_id.hex}"
   force_destroy = true
-  tags = {
+  tags = merge(local.storage_tags, {
     Name = "ocr_site"
-  }
+  })
 }
 
 resource "random_id" "site_id" {

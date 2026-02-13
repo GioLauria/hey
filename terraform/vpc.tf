@@ -4,49 +4,49 @@ resource "aws_vpc" "rds_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = {
+  tags = merge(local.vpc_tags, {
     Name = "rds-vpc"
-  }
+  })
 }
 
 resource "aws_subnet" "rds_subnet1" {
   vpc_id            = aws_vpc.rds_vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "eu-west-2a"
-  tags = {
+  tags = merge(local.vpc_tags, {
     Name = "rds-subnet1"
-  }
+  })
 }
 
 resource "aws_subnet" "rds_subnet2" {
   vpc_id            = aws_vpc.rds_vpc.id
   cidr_block        = "10.0.2.0/24"
   availability_zone = "eu-west-2b"
-  tags = {
+  tags = merge(local.vpc_tags, {
     Name = "rds-subnet2"
-  }
+  })
 }
 
 resource "aws_internet_gateway" "rds_igw" {
   vpc_id = aws_vpc.rds_vpc.id
-  tags = {
+  tags = merge(local.vpc_tags, {
     Name = "rds-igw"
-  }
+  })
 }
 
 resource "aws_eip" "nat_eip" {
   domain = "vpc"
-  tags = {
+  tags = merge(local.vpc_tags, {
     Name = "nat-eip"
-  }
+  })
 }
 
 resource "aws_nat_gateway" "nat_gw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.rds_subnet1.id
-  tags = {
+  tags = merge(local.vpc_tags, {
     Name = "nat-gw"
-  }
+  })
 }
 
 resource "aws_route_table" "rds_rt" {
@@ -55,9 +55,9 @@ resource "aws_route_table" "rds_rt" {
     cidr_block     = "0.0.0.0/0"
     gateway_id     = aws_internet_gateway.rds_igw.id
   }
-  tags = {
+  tags = merge(local.vpc_tags, {
     Name = "rds-rt"
-  }
+  })
 }
 
 resource "aws_route_table_association" "rds_rta1" {

@@ -10,9 +10,9 @@ resource "aws_dynamodb_table" "extractions" {
     type = "S"
   }
 
-  tags = {
+  tags = merge(local.dynamodb_tags, {
     Name = "ocr-extractions"
-  }
+  })
 }
 
 resource "aws_dynamodb_table" "visitors" {
@@ -60,7 +60,7 @@ resource "aws_dynamodb_table" "todos" {
     type = "S"
   }
 
-  tags = {
+  tags = merge(local.dynamodb_tags, {
     Name = "ocr-todos"
-  }
+  })
 }
