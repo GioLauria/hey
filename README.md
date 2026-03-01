@@ -89,6 +89,8 @@ terraform apply
 - ✅ **API Gateway** con 6 routes (GET/POST/PUT)
 - ✅ **Lambda Functions**: validate-text, visitor-stats (+ altre in deploy)
 - ✅ **DynamoDB Tables**: ocr-extractions, ocr-visitors, menu-items, ocr-todos
+
+Note: I recently adjusted the Terraform DynamoDB configuration. The project keeps `hash_key` in `terraform/dynamodb.tf` to stay compatible with the current AWS provider in this repo; do `terraform validate` in the `terraform` folder before applying changes. If you upgrade the provider to a version that supports `key_schema`, consider migrating accordingly.
 - ✅ **RDS PostgreSQL**: Database per gestione ristoranti
 - ✅ **S3 Bucket**: Hosting sito statico con CloudFront
 - ✅ **VPC**: Rete isolata con subnet private/public
