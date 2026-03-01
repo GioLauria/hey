@@ -89,8 +89,27 @@ terraform apply
 - ✅ **API Gateway** con 6 routes (GET/POST/PUT)
 - ✅ **Lambda Functions**: validate-text, visitor-stats (+ altre in deploy)
 - ✅ **DynamoDB Tables**: ocr-extractions, ocr-visitors, menu-items, ocr-todos
-
 Note: I recently adjusted the Terraform DynamoDB configuration. The project keeps `hash_key` in `terraform/dynamodb.tf` to stay compatible with the current AWS provider in this repo; do `terraform validate` in the `terraform` folder before applying changes. If you upgrade the provider to a version that supports `key_schema`, consider migrating accordingly.
+
+**Developer Setup**
+
+- **Enable repository hooks (recommended)**: the project provides a repository hooks folder `.githooks` with a `pre-commit` script that validates Terraform and Python syntax. To enable locally run:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+- **Quick validation workflow**:
+
+```bash
+cd terraform
+terraform init -backend=false
+terraform validate
+```
+
+- **Commits**: We sign commits in this repo. Configure GPG signing or use your platform key. To skip hooks for a one-off commit, use `--no-verify`.
+
+- **Docs**: Additional developer docs are available in the `docs/` folder — see `docs/index.md`.
 - ✅ **RDS PostgreSQL**: Database per gestione ristoranti
 - ✅ **S3 Bucket**: Hosting sito statico con CloudFront
 - ✅ **VPC**: Rete isolata con subnet private/public
