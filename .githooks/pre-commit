@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Pre-commit hook: validate Terraform and Python on staged files
+# - Runs `terraform fmt -check` and `terraform validate` in ./terraform if any .tf files staged
+# - Runs Python syntax check for staged .py files
+
+echo "Running pre-commit checks..."
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if echo "$STAGED_FILES" | grep -qE '\.tf$|\.tfvars$'; then
+  if [ -d "terraform" ]; then
+    echo "Checking Terraform formatting..."
+    (cd terraform && terraform fmt -check) || {
+      echo "terraform fmt check failed. Run 'terraform fmt' or fix formatting." >&2
+      exit 1
+    }
+
+    echo "Initializing Terraform (no backend) and validating..."
+    (cd terraform && terraform init -backend=false >/dev/null 2>&1 || true)
+    (cd terraform && terraform validate) || {
+      echo "terraform validate failed." >&2
+      exit 1
+    }
+  else
+    echo "terraform directory not found; skipping Terraform checks."
+  fi
+fi
+
+if echo "$STAGED_FILES" | grep -qE '\.py$'; then
+  echo "Checking Python syntax for staged files..."
+  # only check files that still exist in the working tree
+  for f in $(echo "$STAGED_FILES" | grep -E '\.py$' || true); do
+    if [ -f "$f" ]; then
+      python -m py_compile "$f" || {
+        echo "Python syntax error in $f" >&2
+        exit 1
+      }
+    fi
+  done
+fi
+
+echo "Pre-commit checks passed."
+exit 0
